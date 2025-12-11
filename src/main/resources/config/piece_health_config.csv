@@ -1,0 +1,8 @@
+# Configuration des points de vie des pièces
+# Format: piece,health
+KING,6
+KNIGHT,1
+BISHOP,1
+QUEEN,1
+PAWN,2
+ROOK,1

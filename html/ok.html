@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Échiquier avec Terrain de Hockey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            margin: 20px 0;
+            color: #ecf0f1;
+            text-align: center;
+        }
+        
+        .description {
+            text-align: center;
+            margin-bottom: 20px;
+            max-width: 800px;
+            color: #bdc3c7;
+        }
+        
+        /* Échiquier 8x8 */
+        .chessboard {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            width: 640px;
+            height: 640px;
+            border: 10px solid #7d5a44;
+            background: #7d5a44;
+            position: relative;
+        }
+        
+        .square {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .white {
+            background-color: #f0d9b5;
+        }
+        
+        .black {
+            background-color: #b58863;
+        }
+        
+        /* Terrain de hockey - TOUT LE CENTRE */
+        .hockey-square {
+            background-color: #1e3a8a !important;
+        }
+        
+        /* Raquettes HORIZONTALES DANS les cases bleues */
+        .hockey-stick {
+            position: absolute;
+            width: 70px; /* Plus court pour rentrer dans une case */
+            height: 12px;
+            background-color: #8b4513;
+            border: 2px solid #5d4037;
+            border-radius: 2px;
+            z-index: 10;
+        }
+        
+        /* Raquette du HAUT - dans une case bleue de la ligne 3 */
+        .top-stick {
+            top: 200px; /* Centre de la ligne 3 (2.5 * 80px) */
+            left: 320px; /* Centre de l'échiquier */
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Raquette du BAS - dans une case bleue de la ligne 6 */
+        .bottom-stick {
+            bottom: 200px; /* Centre de la ligne 6 */
+            left: 320px; /* Centre de l'échiquier */
+            transform: translate(-50%, 50%);
+        }
+        
+        /* Balle DANS une case bleue au centre */
+        .puck {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: black;
+            border-radius: 50%;
+            border: 2px solid #333;
+            z-index: 10;
+            top: 320px; /* Centre de l'échiquier */
+            left: 320px; /* Centre de l'échiquier */
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Pièces d'échecs */
+        .piece {
+            font-size: 50px;
+            font-weight: bold;
+            z-index: 5;
+        }
+        
+        .white-piece {
+            color: white;
+        }
+        
+        .black-piece {
+            color: black;
+        }
+        
+        /* Conteneur pour tout */
+        .game-container {
+            position: relative;
+            width: 640px;
+            height: 640px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Échiquier avec Terrain de Hockey</h1>
+    
+    <div class="description">
+        Terrain bleu: lignes 3,4,5,6 - toutes colonnes<br>
+        Raquettes et balle DANS les cases bleues du terrain
+    </div>
+    
+    <div class="game-container">
+        <div class="chessboard" id="chessboard">
+            <!-- Échiquier généré ici -->
+        </div>
+        <!-- Raquettes et balle DANS le terrain bleu -->
+        <div class="hockey-stick top-stick"></div>
+        <div class="hockey-stick bottom-stick"></div>
+        <div class="puck"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chessboard = document.getElementById('chessboard');
+            
+            // Pièces d'échecs
+            const pieceSetup = {
+                1: ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'],
+                2: ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'],
+                7: ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'],
+                8: ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖']
+            };
+            
+            // Créer échiquier
+            for (let row = 1; row <= 8; row++) {
+                for (let col = 1; col <= 8; col++) {
+                    const square = document.createElement('div');
+                    square.className = `square ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
+                    
+                    // Terrain de hockey: lignes 3-6, toutes colonnes
+                    if (row >= 3 && row <= 6) {
+                        square.classList.add('hockey-square');
+                    }
+                    
+                    // Pièces d'échecs
+                    if (pieceSetup[row] && pieceSetup[row][col-1]) {
+                        const piece = document.createElement('div');
+                        piece.className = `piece ${row <= 2 ? 'white-piece' : 'black-piece'}`;
+                        piece.textContent = pieceSetup[row][col-1];
+                        square.appendChild(piece);
+                    }
+                    
+                    chessboard.appendChild(square);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
