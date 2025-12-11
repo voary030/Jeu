@@ -125,15 +125,15 @@ public class ConfigLoader {
     private static Map<String, String> loadCSV(String resourcePath) throws IOException {
         Map<String, String> config = new HashMap<>();
         
-        try (InputStream is = ConfigLoader.class.getResourceAsStream(resourcePath);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-            
+        try (InputStream is = ConfigLoader.class.getResourceAsStream(resourcePath)) {
+
             if (is == null) {
                 throw new IOException("Fichier non trouvé: " + resourcePath);
             }
-            
-            String line;
-            while ((line = reader.readLine()) != null) {
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
                 // Ignorer les commentaires et lignes vides
                 line = line.trim();
                 if (line.isEmpty() || line.startsWith("#")) {
@@ -147,7 +147,8 @@ public class ConfigLoader {
                 }
             }
         }
-        
+    }
+
         return config;
     }
     

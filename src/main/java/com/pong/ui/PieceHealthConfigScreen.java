@@ -1,6 +1,7 @@
 package com.pong.ui;
 
 import com.pong.config.PieceHealthConfig;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -138,7 +139,18 @@ public class PieceHealthConfigScreen extends VBox {
         spinner.setValueFactory(factory);
         spinner.setPrefWidth(75);
         spinner.setEditable(true);
-        spinner.setStyle("-fx-background-color: #252538; -fx-font-size: 12px;");
+        spinner.setStyle("-fx-background-color: #252538; -fx-font-size: 12px; -fx-control-inner-background: #252538;");
+        // Forcer le style du champ texte interne du Spinner
+        spinner.getEditor().setStyle("-fx-text-fill: " + TEXT_LIGHT + 
+            "; -fx-background-color: #252538; -fx-highlight-fill: " + ACCENT_ROSE + 
+            "; -fx-highlight-text-fill: white;");
+        // Initialiser et synchroniser l'affichage de la valeur
+        spinner.getEditor().setText(String.valueOf(value));
+        spinner.valueProperty().addListener((obs, oldV, newV) -> {
+            if (newV != null) {
+                spinner.getEditor().setText(String.valueOf(newV));
+            }
+        });
         
         grid.add(labelBox, colOffset, row);
         grid.add(spinner, colOffset + 1, row);
