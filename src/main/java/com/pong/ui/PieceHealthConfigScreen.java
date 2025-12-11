@@ -7,7 +7,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -30,81 +32,117 @@ public class PieceHealthConfigScreen extends VBox {
     private Button cancelButton;
     private Button resetButton;
     
+    // Palette moderne
+    private static final String BG_DARK = "#0a0a0f";
+    private static final String BG_CARD = "#14141f";
+    private static final String BG_SECTION = "#1a1a2e";
+    private static final String ACCENT_ROSE = "#f43f5e";
+    private static final String ACCENT_GREEN = "#10b981";
+    private static final String ACCENT_AMBER = "#f59e0b";
+    private static final String TEXT_LIGHT = "#e2e8f0";
+    private static final String TEXT_DIM = "#94a3b8";
+    
     public PieceHealthConfigScreen(double width, double height) {
-        super(20);
+        super(0);
         setAlignment(Pos.CENTER);
         setPrefSize(width, height);
-        setStyle("-fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e);");
+        setStyle("-fx-background-color: " + BG_DARK + ";");
         setPadding(new Insets(30));
         
-        // Titre
-        Text title = new Text("❤️ Configuration des Points de Vie");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
-        title.setFill(Color.web("#e74c3c"));
+        // Carte principale
+        VBox mainCard = new VBox(20);
+        mainCard.setAlignment(Pos.CENTER);
+        mainCard.setPadding(new Insets(35, 50, 35, 50));
+        mainCard.setMaxWidth(500);
+        mainCard.setStyle("-fx-background-color: " + BG_CARD + "; -fx-background-radius: 20;");
         
-        Text subtitle = new Text("Définissez les HP de chaque type de pièce");
-        subtitle.setFont(Font.font("Arial", FontWeight.NORMAL, 16));
-        subtitle.setFill(Color.web("#ecf0f1"));
+        DropShadow shadow = new DropShadow();
+        shadow.setColor(Color.web(ACCENT_ROSE, 0.25));
+        shadow.setRadius(35);
+        mainCard.setEffect(shadow);
         
-        // Grille de spinners
+        // En-tête
+        VBox header = new VBox(8);
+        header.setAlignment(Pos.CENTER);
+        
+        Text title = new Text("Points de Vie");
+        title.setFont(Font.font("System", FontWeight.BOLD, 28));
+        title.setFill(Color.web(TEXT_LIGHT));
+        
+        Text subtitle = new Text("Ajustez la résistance de chaque pièce");
+        subtitle.setFont(Font.font("System", FontWeight.NORMAL, 13));
+        subtitle.setFill(Color.web(TEXT_DIM));
+        
+        header.getChildren().addAll(title, subtitle);
+        
+        // Grille de spinners - 2 colonnes
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
-        grid.setHgap(20);
+        grid.setHgap(35);
         grid.setVgap(15);
-        grid.setPadding(new Insets(20));
-        grid.setStyle("-fx-background-color: rgba(0,0,0,0.3); -fx-background-radius: 10;");
+        grid.setPadding(new Insets(20, 25, 20, 25));
+        grid.setStyle("-fx-background-color: " + BG_SECTION + "; -fx-background-radius: 14;");
         
-        // Roi
-        addPieceRow(grid, 0, "♔ Roi:", kingSpinner = createSpinner(PieceHealthConfig.getKingHealth(), 1, 50));
+        // Colonne gauche
+        kingSpinner = addPieceRow(grid, 0, 0, "Roi", "K", PieceHealthConfig.getKingHealth(), 1, 50);
+        queenSpinner = addPieceRow(grid, 1, 0, "Reine", "Q", PieceHealthConfig.getQueenHealth(), 1, 30);
+        rookSpinner = addPieceRow(grid, 2, 0, "Tour", "R", PieceHealthConfig.getRookHealth(), 1, 20);
         
-        // Reine
-        addPieceRow(grid, 1, "♕ Reine:", queenSpinner = createSpinner(PieceHealthConfig.getQueenHealth(), 1, 30));
-        
-        // Tour
-        addPieceRow(grid, 2, "♖ Tour:", rookSpinner = createSpinner(PieceHealthConfig.getRookHealth(), 1, 20));
-        
-        // Fou
-        addPieceRow(grid, 3, "♗ Fou:", bishopSpinner = createSpinner(PieceHealthConfig.getBishopHealth(), 1, 15));
-        
-        // Cavalier
-        addPieceRow(grid, 4, "♘ Cavalier:", knightSpinner = createSpinner(PieceHealthConfig.getKnightHealth(), 1, 15));
-        
-        // Pion
-        addPieceRow(grid, 5, "♙ Pion:", pawnSpinner = createSpinner(PieceHealthConfig.getPawnHealth(), 1, 10));
+        // Colonne droite
+        bishopSpinner = addPieceRow(grid, 0, 2, "Fou", "B", PieceHealthConfig.getBishopHealth(), 1, 15);
+        knightSpinner = addPieceRow(grid, 1, 2, "Cavalier", "N", PieceHealthConfig.getKnightHealth(), 1, 15);
+        pawnSpinner = addPieceRow(grid, 2, 2, "Pion", "P", PieceHealthConfig.getPawnHealth(), 1, 10);
         
         // Boutons
-        VBox buttonBox = new VBox(10);
+        HBox buttonBox = new HBox(12);
         buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setPadding(new Insets(10, 0, 0, 0));
         
-        validateButton = createButton("Valider", "#27ae60", "#2ecc71");
-        resetButton = createButton("Réinitialiser", "#f39c12", "#e67e22");
-        cancelButton = createButton("Annuler", "#e74c3c", "#c0392b");
-        
-        buttonBox.getChildren().addAll(validateButton, resetButton, cancelButton);
+        validateButton = createStyledButton("Valider", ACCENT_GREEN, true);
+        resetButton = createStyledButton("Réinitialiser", ACCENT_AMBER, true);
+        cancelButton = createStyledButton("Annuler", "#64748b", false);
         
         // Réinitialiser aux valeurs par défaut
         resetButton.setOnAction(e -> resetToDefaults());
         
-        getChildren().addAll(title, subtitle, grid, buttonBox);
-    }
-    
-    private void addPieceRow(GridPane grid, int row, String label, Spinner<Integer> spinner) {
-        Label pieceLabel = new Label(label);
-        pieceLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        pieceLabel.setTextFill(Color.web("#ecf0f1"));
+        buttonBox.getChildren().addAll(validateButton, resetButton, cancelButton);
         
-        grid.add(pieceLabel, 0, row);
-        grid.add(spinner, 1, row);
+        mainCard.getChildren().addAll(header, grid, buttonBox);
+        getChildren().add(mainCard);
     }
     
-    private Spinner<Integer> createSpinner(int initialValue, int min, int max) {
+    private Spinner<Integer> addPieceRow(GridPane grid, int row, int colOffset, String name, String symbol, int value, int min, int max) {
+        // Badge avec symbole
+        Label badge = new Label(symbol);
+        badge.setFont(Font.font("System", FontWeight.BOLD, 13));
+        badge.setTextFill(Color.web(ACCENT_ROSE));
+        badge.setMinWidth(26);
+        badge.setMinHeight(26);
+        badge.setAlignment(Pos.CENTER);
+        badge.setStyle("-fx-background-color: " + ACCENT_ROSE + "22; -fx-background-radius: 6;");
+        
+        // Conteneur badge + nom
+        HBox labelBox = new HBox(8);
+        labelBox.setAlignment(Pos.CENTER_LEFT);
+        
+        Label nameLabel = new Label(name);
+        nameLabel.setFont(Font.font("System", FontWeight.MEDIUM, 13));
+        nameLabel.setTextFill(Color.web(TEXT_LIGHT));
+        nameLabel.setMinWidth(65);
+        
+        labelBox.getChildren().addAll(badge, nameLabel);
+        
+        // Spinner
         Spinner<Integer> spinner = new Spinner<>();
-        SpinnerValueFactory<Integer> valueFactory = 
-            new SpinnerValueFactory.IntegerSpinnerValueFactory(min, max, initialValue);
-        spinner.setValueFactory(valueFactory);
-        spinner.setPrefWidth(100);
+        SpinnerValueFactory<Integer> factory = new SpinnerValueFactory.IntegerSpinnerValueFactory(min, max, value);
+        spinner.setValueFactory(factory);
+        spinner.setPrefWidth(75);
         spinner.setEditable(true);
-        spinner.setStyle("-fx-background-color: #34495e; -fx-text-fill: white;");
+        spinner.setStyle("-fx-background-color: #252538; -fx-font-size: 12px;");
+        
+        grid.add(labelBox, colOffset, row);
+        grid.add(spinner, colOffset + 1, row);
+        
         return spinner;
     }
     
@@ -117,20 +155,24 @@ public class PieceHealthConfigScreen extends VBox {
         pawnSpinner.getValueFactory().setValue(2);
     }
     
-    private Button createButton(String text, String color, String hoverColor) {
+    private Button createStyledButton(String text, String color, boolean filled) {
         Button button = new Button(text);
-        button.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        button.setPrefWidth(200);
-        button.setPrefHeight(50);
-        button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; "
-                + "-fx-background-radius: 8; -fx-cursor: hand;");
+        button.setFont(Font.font("System", FontWeight.BOLD, 13));
+        button.setPrefWidth(115);
+        button.setPrefHeight(40);
         
-        button.setOnMouseEntered(e -> 
-            button.setStyle("-fx-background-color: " + hoverColor + "; -fx-text-fill: white; "
-                    + "-fx-background-radius: 8; -fx-cursor: hand;"));
-        button.setOnMouseExited(e -> 
-            button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; "
-                    + "-fx-background-radius: 8; -fx-cursor: hand;"));
+        String baseStyle, hoverStyle;
+        if (filled) {
+            baseStyle = "-fx-background-color: " + color + "; -fx-text-fill: white; -fx-background-radius: 10; -fx-cursor: hand;";
+            hoverStyle = "-fx-background-color: derive(" + color + ", 15%); -fx-text-fill: white; -fx-background-radius: 10; -fx-cursor: hand;";
+        } else {
+            baseStyle = "-fx-background-color: transparent; -fx-text-fill: " + TEXT_LIGHT + "; -fx-background-radius: 10; -fx-cursor: hand; -fx-border-color: " + color + "; -fx-border-width: 2; -fx-border-radius: 8;";
+            hoverStyle = "-fx-background-color: " + color + "33; -fx-text-fill: " + TEXT_LIGHT + "; -fx-background-radius: 10; -fx-cursor: hand; -fx-border-color: " + color + "; -fx-border-width: 2; -fx-border-radius: 8;";
+        }
+        
+        button.setStyle(baseStyle);
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(baseStyle));
         
         return button;
     }
@@ -143,7 +185,6 @@ public class PieceHealthConfigScreen extends VBox {
         PieceHealthConfig.setKnightHealth(knightSpinner.getValue());
         PieceHealthConfig.setPawnHealth(pawnSpinner.getValue());
         
-        // Sauvegarder dans le fichier CSV
         com.pong.config.ConfigLoader.savePieceHealthConfig();
     }
     

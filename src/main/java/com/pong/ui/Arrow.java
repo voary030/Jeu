@@ -11,8 +11,8 @@ public class Arrow extends Polygon {
     private double angle = 0;
     
     public Arrow() {
-        setFill(Color.web("#27ae60"));
-        setStroke(Color.web("#229954"));
+        setFill(Color.web("#10b981")); // Vert émeraude moderne
+        setStroke(Color.web("#059669"));
         setStrokeWidth(3);
         
         updateArrow();

@@ -39,19 +39,19 @@ public class ChessBoard extends GridPane {
             for (int col = 0; col < COLS; col++) {
                 Rectangle square = new Rectangle(SQUARE_SIZE, SQUARE_SIZE);
                 
-                // Zone de jeu bleue au centre (lignes 2-5, colonnes 0-7)
+                // Zone de jeu centrale (lignes 2-5) - bleu profond moderne
                 if (row >= 2 && row <= 5) {
-                    square.setFill(Color.web("#6c7285ff")); // Bleu comme dans le HTML
+                    square.setFill(Color.web("#1e293b")); // Slate sombre
                 } else {
-                    // Damier pour les lignes avec pièces
+                    // Damier moderne pour les zones de pièces
                     if ((row + col) % 2 == 0) {
-                        square.setFill(Color.web("#f0d9b5")); // Beige clair
+                        square.setFill(Color.web("#c4b5a0")); // Sable clair
                     } else {
-                        square.setFill(Color.web("#b58863")); // Marron clair
+                        square.setFill(Color.web("#8b7355")); // Bronze foncé
                     }
                 }
                 
-                square.setStroke(Color.web("#7d5a44"));
+                square.setStroke(Color.web("#374151"));
                 square.setStrokeWidth(1);
                 
                 squares[row][col] = square;

@@ -25,84 +25,74 @@ public class SidePanel extends VBox {
     private Label configLabel;
     private Label piecesConfigLabel;
     
+    // Palette moderne
+    private static final String BG_PANEL = "#0f0f17";
+    private static final String BG_SECTION = "#161622";
+    private static final String ACCENT_ROSE = "#f43f5e";
+    private static final String ACCENT_GREEN = "#10b981";
+    private static final String ACCENT_VIOLET = "#8b5cf6";
+    private static final String ACCENT_CYAN = "#06b6d4";
+    private static final String TEXT_LIGHT = "#e2e8f0";
+    private static final String TEXT_DIM = "#64748b";
+    private static final String BORDER_COLOR = "#1e1e2e";
+    
     public SidePanel() {
-        super(15);
+        super(12);
         setAlignment(Pos.TOP_CENTER);
-        setPadding(new Insets(20));
-        setStyle("-fx-background-color: #34495e; -fx-border-color: #2c3e50; -fx-border-width: 0 2 0 0;");
-        setPrefWidth(200);
+        setPadding(new Insets(20, 15, 20, 15));
+        setStyle("-fx-background-color: " + BG_PANEL + "; -fx-border-color: " + BORDER_COLOR + "; -fx-border-width: 0 0 0 2;");
+        setPrefWidth(210);
         
         // Titre
-        Label title = new Label("⚙️ CONTRÔLES");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        title.setTextFill(Color.web("#f39c12"));
+        Label title = new Label("CONTRÔLES");
+        title.setFont(Font.font("System", FontWeight.BLACK, 14));
+        title.setTextFill(Color.web(TEXT_LIGHT));
+        title.setPadding(new Insets(0, 0, 5, 0));
         
         // Bouton Pause
-        pauseButton = createButton("⏸ Pause", "#e74c3c");
-        pauseButton.setPrefWidth(160);
+        pauseButton = createControlButton("Pause", ACCENT_ROSE, true);
         
         // Bouton Reprendre (initialement caché)
-        resumeButton = createButton("▶ Reprendre", "#27ae60");
-        resumeButton.setPrefWidth(160);
+        resumeButton = createControlButton("Reprendre", ACCENT_GREEN, true);
         resumeButton.setVisible(false);
         resumeButton.setManaged(false);
         
-        Separator sep1 = new Separator();
+        Separator sep1 = createStyledSeparator();
         
-        // Configuration du terrain
-        Label configTitle = new Label("📐 Configuration");
-        configTitle.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        configTitle.setTextFill(Color.web("#ecf0f1"));
-        
-        configLabel = new Label();
-        configLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
-        configLabel.setTextFill(Color.web("#bdc3c7"));
-        configLabel.setWrapText(true);
+        // Section Configuration du terrain
+        VBox configSection = createInfoSection("TERRAIN", configLabel = new Label());
         updateConfigInfo();
         
-        Separator sep2 = new Separator();
+        Separator sep2 = createStyledSeparator();
         
-        // Configuration des pièces
-        Label piecesTitle = new Label("♟️ Points de Vie");
-        piecesTitle.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        piecesTitle.setTextFill(Color.web("#ecf0f1"));
-        
-        piecesConfigLabel = new Label();
-        piecesConfigLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 11));
-        piecesConfigLabel.setTextFill(Color.web("#bdc3c7"));
-        piecesConfigLabel.setWrapText(true);
+        // Section Points de Vie
+        VBox piecesSection = createInfoSection("POINTS DE VIE", piecesConfigLabel = new Label());
         updatePiecesConfigInfo();
         
-        Separator sep3 = new Separator();
+        Separator sep3 = createStyledSeparator();
         
-        // Boutons de configuration
-        Label configButtonsTitle = new Label("⚙️ Réglages");
-        configButtonsTitle.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        configButtonsTitle.setTextFill(Color.web("#ecf0f1"));
+        // Section Réglages
+        Label settingsTitle = new Label("RÉGLAGES");
+        settingsTitle.setFont(Font.font("System", FontWeight.BOLD, 11));
+        settingsTitle.setTextFill(Color.web(TEXT_DIM));
         
-        boardConfigButton = createButton("📐 Terrain", "#9b59b6");
-        boardConfigButton.setPrefWidth(160);
+        boardConfigButton = createControlButton("Terrain", ACCENT_VIOLET, false);
+        piecesConfigButton = createControlButton("Pièces", ACCENT_CYAN, false);
         
-        piecesConfigButton = createButton("♟️ Pièces", "#3498db");
-        piecesConfigButton.setPrefWidth(160);
+        Separator sep4 = createStyledSeparator();
         
-        Separator sep4 = new Separator();
-        
-        returnMenuButton = createButton("🏠 Menu Principal", "#e74c3c");
-        returnMenuButton.setPrefWidth(160);
+        returnMenuButton = createControlButton("Menu Principal", "#64748b", false);
         
         getChildren().addAll(
             title,
             pauseButton,
             resumeButton,
             sep1,
-            configTitle,
-            configLabel,
+            configSection,
             sep2,
-            piecesTitle,
-            piecesConfigLabel,
+            piecesSection,
             sep3,
-            configButtonsTitle,
+            settingsTitle,
             boardConfigButton,
             piecesConfigButton,
             sep4,
@@ -110,26 +100,54 @@ public class SidePanel extends VBox {
         );
     }
     
-    private Button createButton(String text, String color) {
+    private Separator createStyledSeparator() {
+        Separator sep = new Separator();
+        sep.setStyle("-fx-background-color: " + BORDER_COLOR + ";");
+        sep.setPadding(new Insets(5, 0, 5, 0));
+        return sep;
+    }
+    
+    private VBox createInfoSection(String title, Label contentLabel) {
+        VBox section = new VBox(6);
+        section.setPadding(new Insets(10));
+        section.setStyle("-fx-background-color: " + BG_SECTION + "; -fx-background-radius: 10;");
+        
+        Label titleLabel = new Label(title);
+        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 11));
+        titleLabel.setTextFill(Color.web(TEXT_DIM));
+        
+        contentLabel.setFont(Font.font("System", FontWeight.NORMAL, 11));
+        contentLabel.setTextFill(Color.web(TEXT_LIGHT));
+        contentLabel.setWrapText(true);
+        contentLabel.setLineSpacing(2);
+        
+        section.getChildren().addAll(titleLabel, contentLabel);
+        return section;
+    }
+    
+    private Button createControlButton(String text, String color, boolean filled) {
         Button button = new Button(text);
-        button.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; "
-                + "-fx-background-radius: 5; -fx-cursor: hand;");
+        button.setFont(Font.font("System", FontWeight.BOLD, 12));
+        button.setPrefWidth(175);
+        button.setPrefHeight(36);
         
-        // Couleurs de hover
-        String hoverColor;
-        if (color.equals("#e74c3c")) hoverColor = "#c0392b";
-        else if (color.equals("#27ae60")) hoverColor = "#2ecc71";
-        else if (color.equals("#9b59b6")) hoverColor = "#8e44ad";
-        else if (color.equals("#3498db")) hoverColor = "#2980b9";
-        else hoverColor = "#2c3e50";
+        String baseStyle, hoverStyle;
         
-        button.setOnMouseEntered(e -> 
-            button.setStyle("-fx-background-color: " + hoverColor + "; -fx-text-fill: white; "
-                    + "-fx-background-radius: 5; -fx-cursor: hand;"));
-        button.setOnMouseExited(e -> 
-            button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; "
-                    + "-fx-background-radius: 5; -fx-cursor: hand;"));
+        if (filled) {
+            baseStyle = "-fx-background-color: " + color + "; -fx-text-fill: white; "
+                    + "-fx-background-radius: 8; -fx-cursor: hand;";
+            hoverStyle = "-fx-background-color: derive(" + color + ", 15%); -fx-text-fill: white; "
+                    + "-fx-background-radius: 8; -fx-cursor: hand;";
+        } else {
+            baseStyle = "-fx-background-color: transparent; -fx-text-fill: " + TEXT_LIGHT + "; "
+                    + "-fx-background-radius: 8; -fx-cursor: hand; -fx-border-color: " + color + "; -fx-border-width: 1.5; -fx-border-radius: 6;";
+            hoverStyle = "-fx-background-color: " + color + "22; -fx-text-fill: " + color + "; "
+                    + "-fx-background-radius: 8; -fx-cursor: hand; -fx-border-color: " + color + "; -fx-border-width: 1.5; -fx-border-radius: 6;";
+        }
+        
+        button.setStyle(baseStyle);
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(baseStyle));
         
         return button;
     }
@@ -141,26 +159,19 @@ public class SidePanel extends VBox {
         
         String pieces = "";
         if (BoardConfig.hasRooks()) pieces = "Complète";
-        else if (BoardConfig.hasKnights()) pieces = "Roi + Reine + Fous + Cavaliers";
-        else if (BoardConfig.hasBishops()) pieces = "Roi + Reine + Fous";
-        else pieces = "Roi + Reine";
+        else if (BoardConfig.hasKnights()) pieces = "Sans Tours";
+        else if (BoardConfig.hasBishops()) pieces = "Basique +";
+        else pieces = "Basique";
         
         configLabel.setText(String.format(
-            "Colonnes: %d\n" +
-            "Dimension: %dx%d px\n" +
-            "Pièces: %s",
+            "Colonnes: %d\nTaille: %dx%d\nConfig: %s",
             cols, width, height, pieces
         ));
     }
     
     private void updatePiecesConfigInfo() {
         piecesConfigLabel.setText(String.format(
-            "♚ Roi: %d PV\n" +
-            "♛ Reine: %d PV\n" +
-            "♜ Tour: %d PV\n" +
-            "♝ Fou: %d PV\n" +
-            "♞ Cavalier: %d PV\n" +
-            "♟ Pion: %d PV",
+            "K: %d  |  Q: %d  |  R: %d\nB: %d  |  N: %d  |  P: %d",
             PieceHealthConfig.getKingHealth(),
             PieceHealthConfig.getQueenHealth(),
             PieceHealthConfig.getRookHealth(),

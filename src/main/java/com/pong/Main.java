@@ -64,19 +64,19 @@ public class Main extends Application {
         VBox topPane = new VBox(5);
         topPane.setPadding(new Insets(15));
         topPane.setAlignment(Pos.CENTER);
-        topPane.setStyle("-fx-background-color: #34495e;");
+        topPane.setStyle("-fx-background-color: #0f0f17;");
         
-        Label titleLabel = new Label("♔ ÉCHEC PONG ♚");
-        titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
-        titleLabel.setTextFill(Color.web("#f39c12"));
+        Label titleLabel = new Label("CHESS STRIKER");
+        titleLabel.setFont(Font.font("System", FontWeight.BLACK, 22));
+        titleLabel.setTextFill(Color.web("#e2e8f0"));
         
-        statusLabel = new Label("Partie en cours - Détruisez le Roi adverse!");
-        statusLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        statusLabel.setTextFill(Color.web("#ecf0f1"));
+        statusLabel = new Label("Partie en cours - Éliminez le Roi adverse");
+        statusLabel.setFont(Font.font("System", FontWeight.MEDIUM, 13));
+        statusLabel.setTextFill(Color.web("#94a3b8"));
         
         scoreLabel = new Label("Score: 0 - 0");
-        scoreLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        scoreLabel.setTextFill(Color.web("#3498db"));
+        scoreLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        scoreLabel.setTextFill(Color.web("#06b6d4"));
         
         topPane.getChildren().addAll(titleLabel, scoreLabel, statusLabel);
         return topPane;
@@ -87,17 +87,17 @@ public class Main extends Application {
      */
     private VBox createBottomInfoPane() {
         VBox bottomPane = new VBox(5);
-        bottomPane.setPadding(new Insets(15));
+        bottomPane.setPadding(new Insets(12));
         bottomPane.setAlignment(Pos.CENTER);
-        bottomPane.setStyle("-fx-background-color: #767a7eff;");
+        bottomPane.setStyle("-fx-background-color: #161622;");
         
-        instructionsLabel = new Label("⊕ CLIQUEZ sur une raquette pour activer le joueur | Q/E pour tourner la flèche | ENTER pour lancer la balle!");
-        instructionsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 12));
-        instructionsLabel.setTextFill(Color.web("#ecf0f1"));
+        instructionsLabel = new Label("CLIC sur raquette = activer | Q/E = orienter | ENTRÉE = lancer");
+        instructionsLabel.setFont(Font.font("System", FontWeight.MEDIUM, 12));
+        instructionsLabel.setTextFill(Color.web("#e2e8f0"));
         
-        Label infoLabel = new Label("🎯 Orientation: Flèche verte indique la direction du tir | A/D et flèches = Déplacer raquettes");
-        infoLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 11));
-        infoLabel.setTextFill(Color.web("#f39c12"));
+        Label infoLabel = new Label("Flèche verte = direction du tir  |  A/D et flèches = déplacer raquettes");
+        infoLabel.setFont(Font.font("System", FontWeight.NORMAL, 11));
+        infoLabel.setTextFill(Color.web("#f59e0b"));
         
         bottomPane.getChildren().addAll(instructionsLabel, infoLabel);
         return bottomPane;
@@ -120,7 +120,7 @@ public class Main extends Application {
         
         Scene scene = new Scene(menuScreen);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Échec Pong - Menu");
+        primaryStage.setTitle("Chess Striker");
         primaryStage.setResizable(false);
         primaryStage.show();
     }

@@ -5,8 +5,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -23,44 +25,86 @@ public class BoardConfigScreen extends VBox {
     private Button cancelButton;
     private Label previewLabel;
     
+    // Palette moderne
+    private static final String BG_DARK = "#0a0a0f";
+    private static final String BG_CARD = "#14141f";
+    private static final String ACCENT_CYAN = "#06b6d4";
+    private static final String ACCENT_GREEN = "#10b981";
+    private static final String TEXT_LIGHT = "#e2e8f0";
+    private static final String TEXT_DIM = "#94a3b8";
+    
     public BoardConfigScreen(double width, double height) {
-        super(20);
+        super(0);
         setAlignment(Pos.CENTER);
         setPrefSize(width, height);
-        setStyle("-fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e);");
+        setStyle("-fx-background-color: " + BG_DARK + ";");
         setPadding(new Insets(30));
         
-        // Titre
-        Text title = new Text("🏁 Configuration du Terrain");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
-        title.setFill(Color.web("#f39c12"));
+        // Carte principale
+        VBox mainCard = new VBox(25);
+        mainCard.setAlignment(Pos.CENTER);
+        mainCard.setPadding(new Insets(35, 50, 35, 50));
+        mainCard.setMaxWidth(500);
+        mainCard.setStyle("-fx-background-color: " + BG_CARD + "; -fx-background-radius: 20;");
         
-        Text subtitle = new Text("Choisissez le nombre de pions par camp");
-        subtitle.setFont(Font.font("Arial", FontWeight.NORMAL, 16));
-        subtitle.setFill(Color.web("#ecf0f1"));
+        DropShadow shadow = new DropShadow();
+        shadow.setColor(Color.web(ACCENT_CYAN, 0.25));
+        shadow.setRadius(35);
+        mainCard.setEffect(shadow);
         
-        // Groupe de boutons radio
+        // En-tête
+        VBox header = new VBox(8);
+        header.setAlignment(Pos.CENTER);
+        
+        Text title = new Text("Configuration du Terrain");
+        title.setFont(Font.font("System", FontWeight.BOLD, 28));
+        title.setFill(Color.web(TEXT_LIGHT));
+        
+        Text subtitle = new Text("Sélectionnez le nombre de pièces par camp");
+        subtitle.setFont(Font.font("System", FontWeight.NORMAL, 13));
+        subtitle.setFill(Color.web(TEXT_DIM));
+        
+        header.getChildren().addAll(title, subtitle);
+        
+        // Groupe de toggles en ligne
         sizeGroup = new ToggleGroup();
-        VBox radioBox = new VBox(15);
-        radioBox.setAlignment(Pos.CENTER_LEFT);
-        radioBox.setPadding(new Insets(20));
+        HBox togglesRow = new HBox(12);
+        togglesRow.setAlignment(Pos.CENTER);
+        togglesRow.setPadding(new Insets(15, 0, 15, 0));
         
-        RadioButton size2 = createRadioOption("2 pions", 2, "Roi + Reine uniquement");
-        RadioButton size4 = createRadioOption("4 pions", 4, "Roi + Reine + Fous");
-        RadioButton size6 = createRadioOption("6 pions", 6, "Roi + Reine + Fous + Cavaliers");
-        RadioButton size8 = createRadioOption("8 pions", 8, "Configuration complète avec Tours");
+        ToggleButton size2 = createToggleOption("2", 2);
+        ToggleButton size4 = createToggleOption("4", 4);
+        ToggleButton size6 = createToggleOption("6", 6);
+        ToggleButton size8 = createToggleOption("8", 8);
         
-        sizeGroup.getToggles().addAll(size2, size4, size6, size8);
+        size2.setToggleGroup(sizeGroup);
+        size4.setToggleGroup(sizeGroup);
+        size6.setToggleGroup(sizeGroup);
+        size8.setToggleGroup(sizeGroup);
         
-        // Sélectionne 8 par défaut
         size8.setSelected(true);
         
-        radioBox.getChildren().addAll(size2, size4, size6, size8);
+        togglesRow.getChildren().addAll(size2, size4, size6, size8);
         
-        // Label d'aperçu
+        // Descriptions
+        VBox descriptions = new VBox(8);
+        descriptions.setAlignment(Pos.CENTER);
+        descriptions.setPadding(new Insets(10));
+        descriptions.setStyle("-fx-background-color: #1a1a2e; -fx-background-radius: 12;");
+        
+        Label desc2 = createDescLabel("2 pièces : Roi + Reine uniquement");
+        Label desc4 = createDescLabel("4 pièces : Roi + Reine + Fous");
+        Label desc6 = createDescLabel("6 pièces : Roi + Reine + Fous + Cavaliers");
+        Label desc8 = createDescLabel("8 pièces : Configuration complète avec Tours");
+        
+        descriptions.getChildren().addAll(desc2, desc4, desc6, desc8);
+        
+        // Aperçu
         previewLabel = new Label();
-        previewLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        previewLabel.setTextFill(Color.web("#3498db"));
+        previewLabel.setFont(Font.font("System", FontWeight.MEDIUM, 14));
+        previewLabel.setTextFill(Color.web(ACCENT_CYAN));
+        previewLabel.setPadding(new Insets(12));
+        previewLabel.setStyle("-fx-background-color: " + ACCENT_CYAN + "15; -fx-background-radius: 8;");
         updatePreview(8);
         
         // Écoute les changements
@@ -72,59 +116,94 @@ public class BoardConfigScreen extends VBox {
         });
         
         // Boutons
-        VBox buttonBox = new VBox(10);
+        HBox buttonBox = new HBox(15);
         buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setPadding(new Insets(10, 0, 0, 0));
         
-        validateButton = createButton("Valider", "#27ae60", "#2ecc71");
-        cancelButton = createButton("Annuler", "#e74c3c", "#c0392b");
+        validateButton = createStyledButton("Valider", ACCENT_GREEN, true);
+        cancelButton = createStyledButton("Annuler", "#64748b", false);
         
         buttonBox.getChildren().addAll(validateButton, cancelButton);
         
-        getChildren().addAll(title, subtitle, radioBox, previewLabel, buttonBox);
+        mainCard.getChildren().addAll(header, togglesRow, descriptions, previewLabel, buttonBox);
+        getChildren().add(mainCard);
     }
     
-    private RadioButton createRadioOption(String text, int pawns, String description) {
-        RadioButton radio = new RadioButton(text + " - " + description);
-        radio.setUserData(pawns);
-        radio.setFont(Font.font("Arial", FontWeight.NORMAL, 16));
-        radio.setTextFill(Color.web("#ecf0f1"));
-        radio.setStyle("-fx-cursor: hand;");
-        return radio;
+    private ToggleButton createToggleOption(String text, int pawns) {
+        ToggleButton toggle = new ToggleButton(text);
+        toggle.setUserData(pawns);
+        toggle.setFont(Font.font("System", FontWeight.BOLD, 16));
+        toggle.setPrefWidth(70);
+        toggle.setPrefHeight(50);
+        
+        String baseStyle = "-fx-background-color: #1e1e2e; -fx-text-fill: " + TEXT_LIGHT + "; "
+                + "-fx-background-radius: 12; -fx-cursor: hand; -fx-border-color: #2d2d42; -fx-border-width: 2; -fx-border-radius: 10;";
+        String selectedStyle = "-fx-background-color: " + ACCENT_CYAN + "; -fx-text-fill: white; "
+                + "-fx-background-radius: 12; -fx-cursor: hand; -fx-border-color: " + ACCENT_CYAN + "; -fx-border-width: 2; -fx-border-radius: 10;";
+        
+        toggle.setStyle(baseStyle);
+        
+        toggle.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            toggle.setStyle(isSelected ? selectedStyle : baseStyle);
+        });
+        
+        toggle.setOnMouseEntered(e -> {
+            if (!toggle.isSelected()) {
+                toggle.setStyle("-fx-background-color: #252538; -fx-text-fill: " + ACCENT_CYAN + "; "
+                        + "-fx-background-radius: 12; -fx-cursor: hand; -fx-border-color: " + ACCENT_CYAN + "; -fx-border-width: 2; -fx-border-radius: 10;");
+            }
+        });
+        toggle.setOnMouseExited(e -> {
+            if (!toggle.isSelected()) {
+                toggle.setStyle(baseStyle);
+            }
+        });
+        
+        return toggle;
+    }
+    
+    private Label createDescLabel(String text) {
+        Label label = new Label(text);
+        label.setFont(Font.font("System", FontWeight.NORMAL, 12));
+        label.setTextFill(Color.web(TEXT_DIM));
+        return label;
     }
     
     private void updatePreview(int pawns) {
         int cols = pawns;
         int width = cols * 80;
         int height = 8 * 80;
-        previewLabel.setText(String.format("📐 Terrain: %d colonnes × 8 lignes (%d × %d pixels)", 
+        previewLabel.setText(String.format("Terrain : %d colonnes × 8 lignes  |  %d × %d pixels", 
             cols, width, height));
     }
     
-    private Button createButton(String text, String color, String hoverColor) {
+    private Button createStyledButton(String text, String color, boolean filled) {
         Button button = new Button(text);
-        button.setFont(Font.font("Arial", FontWeight.BOLD, 18));
-        button.setPrefWidth(200);
-        button.setPrefHeight(50);
-        button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; "
-                + "-fx-background-radius: 8; -fx-cursor: hand;");
+        button.setFont(Font.font("System", FontWeight.BOLD, 14));
+        button.setPrefWidth(130);
+        button.setPrefHeight(42);
         
-        button.setOnMouseEntered(e -> 
-            button.setStyle("-fx-background-color: " + hoverColor + "; -fx-text-fill: white; "
-                    + "-fx-background-radius: 8; -fx-cursor: hand;"));
-        button.setOnMouseExited(e -> 
-            button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; "
-                    + "-fx-background-radius: 8; -fx-cursor: hand;"));
+        String baseStyle, hoverStyle;
+        if (filled) {
+            baseStyle = "-fx-background-color: " + color + "; -fx-text-fill: white; -fx-background-radius: 10; -fx-cursor: hand;";
+            hoverStyle = "-fx-background-color: derive(" + color + ", 15%); -fx-text-fill: white; -fx-background-radius: 10; -fx-cursor: hand;";
+        } else {
+            baseStyle = "-fx-background-color: transparent; -fx-text-fill: " + TEXT_LIGHT + "; -fx-background-radius: 10; -fx-cursor: hand; -fx-border-color: " + color + "; -fx-border-width: 2; -fx-border-radius: 8;";
+            hoverStyle = "-fx-background-color: " + color + "33; -fx-text-fill: " + TEXT_LIGHT + "; -fx-background-radius: 10; -fx-cursor: hand; -fx-border-color: " + color + "; -fx-border-width: 2; -fx-border-radius: 8;";
+        }
+        
+        button.setStyle(baseStyle);
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(baseStyle));
         
         return button;
     }
     
     public void applyConfiguration() {
-        RadioButton selected = (RadioButton) sizeGroup.getSelectedToggle();
+        ToggleButton selected = (ToggleButton) sizeGroup.getSelectedToggle();
         if (selected != null) {
             int pawns = (int) selected.getUserData();
             BoardConfig.setNumberOfPawns(pawns);
-            
-            // Sauvegarder dans le fichier CSV
             com.pong.config.ConfigLoader.saveBoardConfig();
         }
     }
