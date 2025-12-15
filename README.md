@@ -2,6 +2,8 @@
 
 Un jeu innovant mêlant échecs et Pong! Chaque pièce d'échecs a des points de vie. Détruisez le Roi adverse pour gagner!
 
+**🚀 Maintenant avec microservice de configuration!** - Les configurations sont gérées par la microservice `ConfigService`.
+
 ## Concept du Jeu
 
 🎯 **Objectif**: Toucher les pièces adverses avec la balle pour réduire leurs PV. Détruisez le Roi (10 PV) pour remporter la victoire!
@@ -14,6 +16,21 @@ Un jeu innovant mêlant échecs et Pong! Chaque pièce d'échecs a des points de
 ✅ **Système de dégâts** - La balle réduit les PV des pièces qu'elle touche
 ✅ **Fin de partie** - Quand un Roi atteint 0 PV, l'adversaire gagne!
 ✅ **Interface intuitive** avec affichage des PV sur chaque pièce
+✅ **ConfigService** - Microservice centralisée pour gérer les configurations
+
+## Architecture avec Microservice
+
+La microservice `ConfigService` gère:
+- 📋 Configuration du plateau (nombre de pions, etc.)
+- ❤️ Points de vie des pièces
+- 🔄 Synchronisation entre clients
+
+Le jeu utilise une **stratégie de fallback automatique**:
+1. Essaie d'abord de charger depuis ConfigService
+2. Bascule sur les fichiers CSV si le service est indisponible
+3. Utilise les valeurs par défaut en dernier recours
+
+Pour plus de détails, voir [README_CONFIGSERVICE.md](README_CONFIGSERVICE.md).
 
 ## Points de Vie des Pièces
 

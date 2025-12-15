@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Classe pour charger les configurations depuis des fichiers CSV
+ * Classe pour charger les configurations depuis la microservice ConfigService
+ * Fallback sur les fichiers CSV si le service n'est pas disponible
  */
 public class ConfigLoader {
     
@@ -23,16 +24,35 @@ public class ConfigLoader {
     }
     
     /**
-     * Charge la configuration du terrain depuis le fichier CSV
+     * Charge la configuration du terrain depuis ConfigService ou CSV
      */
     public static void loadBoardConfig() {
+        // Essayer d'abord le service
+        if (ConfigServiceClient.isServiceAvailable()) {
+            try {
+                System.out.println("  📡 Chargement du terrain via ConfigService...");
+                Map<String, String> config = ConfigServiceClient.getBoardConfig();
+                
+                if (config.containsKey("numberOfPawns")) {
+                    int numberOfPawns = Integer.parseInt(config.get("numberOfPawns"));
+                    BoardConfig.setNumberOfPawns(numberOfPawns);
+                    System.out.println("  ✓ Terrain (service): " + numberOfPawns + " pions");
+                    return;
+                }
+            } catch (Exception e) {
+                System.err.println("⚠️ Erreur chargement via service: " + e.getMessage());
+                System.out.println("  ⬇️ Basculement sur fichier CSV...");
+            }
+        }
+        
+        // Fallback sur CSV
         try {
             Map<String, String> config = loadCSV(BOARD_CONFIG_FILE);
             
             if (config.containsKey("numberOfPawns")) {
                 int numberOfPawns = Integer.parseInt(config.get("numberOfPawns"));
                 BoardConfig.setNumberOfPawns(numberOfPawns);
-                System.out.println("  ✓ Terrain: " + numberOfPawns + " pions");
+                System.out.println("  ✓ Terrain (fichier): " + numberOfPawns + " pions");
             }
             
         } catch (Exception e) {
@@ -42,32 +62,37 @@ public class ConfigLoader {
     }
     
     /**
-     * Charge la configuration des HP des pièces depuis le fichier CSV
+     * Charge la configuration des HP des pièces depuis ConfigService ou CSV
      */
     public static void loadPieceHealthConfig() {
+        // Essayer d'abord le service
+        if (ConfigServiceClient.isServiceAvailable()) {
+            try {
+                System.out.println("  📡 Chargement des HP via ConfigService...");
+                Map<String, String> config = ConfigServiceClient.getAllPieceHealthConfig();
+                
+                if (!config.isEmpty()) {
+                    setPieceHealthFromMap(config);
+                    System.out.println("  ✓ HP (service): Roi=" + PieceHealthConfig.getKingHealth() + 
+                                     ", Reine=" + PieceHealthConfig.getQueenHealth() +
+                                     ", Tour=" + PieceHealthConfig.getRookHealth() +
+                                     ", Fou=" + PieceHealthConfig.getBishopHealth() +
+                                     ", Cavalier=" + PieceHealthConfig.getKnightHealth() +
+                                     ", Pion=" + PieceHealthConfig.getPawnHealth());
+                    return;
+                }
+            } catch (Exception e) {
+                System.err.println("⚠️ Erreur chargement via service: " + e.getMessage());
+                System.out.println("  ⬇️ Basculement sur fichier CSV...");
+            }
+        }
+        
+        // Fallback sur CSV
         try {
             Map<String, String> config = loadCSV(PIECE_HEALTH_CONFIG_FILE);
+            setPieceHealthFromMap(config);
             
-            if (config.containsKey("KING")) {
-                PieceHealthConfig.setKingHealth(Integer.parseInt(config.get("KING")));
-            }
-            if (config.containsKey("QUEEN")) {
-                PieceHealthConfig.setQueenHealth(Integer.parseInt(config.get("QUEEN")));
-            }
-            if (config.containsKey("ROOK")) {
-                PieceHealthConfig.setRookHealth(Integer.parseInt(config.get("ROOK")));
-            }
-            if (config.containsKey("BISHOP")) {
-                PieceHealthConfig.setBishopHealth(Integer.parseInt(config.get("BISHOP")));
-            }
-            if (config.containsKey("KNIGHT")) {
-                PieceHealthConfig.setKnightHealth(Integer.parseInt(config.get("KNIGHT")));
-            }
-            if (config.containsKey("PAWN")) {
-                PieceHealthConfig.setPawnHealth(Integer.parseInt(config.get("PAWN")));
-            }
-            
-            System.out.println("  ✓ HP: Roi=" + PieceHealthConfig.getKingHealth() + 
+            System.out.println("  ✓ HP (fichier): Roi=" + PieceHealthConfig.getKingHealth() + 
                              ", Reine=" + PieceHealthConfig.getQueenHealth() +
                              ", Tour=" + PieceHealthConfig.getRookHealth() +
                              ", Fou=" + PieceHealthConfig.getBishopHealth() +
@@ -81,16 +106,53 @@ public class ConfigLoader {
     }
     
     /**
-     * Sauvegarde la configuration du terrain dans le fichier CSV
+     * Configure les HP des pièces depuis une Map
+     */
+    private static void setPieceHealthFromMap(Map<String, String> config) {
+        if (config.containsKey("KING")) {
+            PieceHealthConfig.setKingHealth(Integer.parseInt(config.get("KING")));
+        }
+        if (config.containsKey("QUEEN")) {
+            PieceHealthConfig.setQueenHealth(Integer.parseInt(config.get("QUEEN")));
+        }
+        if (config.containsKey("ROOK")) {
+            PieceHealthConfig.setRookHealth(Integer.parseInt(config.get("ROOK")));
+        }
+        if (config.containsKey("BISHOP")) {
+            PieceHealthConfig.setBishopHealth(Integer.parseInt(config.get("BISHOP")));
+        }
+        if (config.containsKey("KNIGHT")) {
+            PieceHealthConfig.setKnightHealth(Integer.parseInt(config.get("KNIGHT")));
+        }
+        if (config.containsKey("PAWN")) {
+            PieceHealthConfig.setPawnHealth(Integer.parseInt(config.get("PAWN")));
+        }
+    }
+    
+    /**
+     * Sauvegarde la configuration du terrain dans ConfigService et/ou CSV
      */
     public static void saveBoardConfig() {
         try {
+            if (ConfigServiceClient.isServiceAvailable()) {
+                try {
+                    System.out.println("  📡 Sauvegarde du terrain via ConfigService...");
+                    ConfigServiceClient.saveBoardConfig(BoardConfig.getNumberOfPawns());
+                    System.out.println("💾 Configuration terrain sauvegardée (service)");
+                    return;
+                } catch (Exception e) {
+                    System.err.println("⚠️ Erreur sauvegarde service: " + e.getMessage());
+                    System.out.println("  ⬇️ Sauvegarde sur fichier CSV...");
+                }
+            }
+            
+            // Fallback sur CSV
             Map<String, String> config = new HashMap<>();
             config.put("numberOfPawns", String.valueOf(BoardConfig.getNumberOfPawns()));
             
             saveCSV(BOARD_CONFIG_FILE, config, 
                    "# Configuration du terrain de jeu\n# Format: parametre,valeur");
-            System.out.println("💾 Configuration terrain sauvegardée");
+            System.out.println("💾 Configuration terrain sauvegardée (fichier)");
             
         } catch (Exception e) {
             System.err.println("❌ Erreur sauvegarde config terrain: " + e.getMessage());
@@ -98,10 +160,28 @@ public class ConfigLoader {
     }
     
     /**
-     * Sauvegarde la configuration des HP dans le fichier CSV
+     * Sauvegarde la configuration des HP dans ConfigService et/ou CSV
      */
     public static void savePieceHealthConfig() {
         try {
+            if (ConfigServiceClient.isServiceAvailable()) {
+                try {
+                    System.out.println("  📡 Sauvegarde des HP via ConfigService...");
+                    ConfigServiceClient.savePieceHealthConfig("KING", PieceHealthConfig.getKingHealth());
+                    ConfigServiceClient.savePieceHealthConfig("QUEEN", PieceHealthConfig.getQueenHealth());
+                    ConfigServiceClient.savePieceHealthConfig("ROOK", PieceHealthConfig.getRookHealth());
+                    ConfigServiceClient.savePieceHealthConfig("BISHOP", PieceHealthConfig.getBishopHealth());
+                    ConfigServiceClient.savePieceHealthConfig("KNIGHT", PieceHealthConfig.getKnightHealth());
+                    ConfigServiceClient.savePieceHealthConfig("PAWN", PieceHealthConfig.getPawnHealth());
+                    System.out.println("💾 Configuration HP sauvegardée (service)");
+                    return;
+                } catch (Exception e) {
+                    System.err.println("⚠️ Erreur sauvegarde service: " + e.getMessage());
+                    System.out.println("  ⬇️ Sauvegarde sur fichier CSV...");
+                }
+            }
+            
+            // Fallback sur CSV
             Map<String, String> config = new HashMap<>();
             config.put("KING", String.valueOf(PieceHealthConfig.getKingHealth()));
             config.put("QUEEN", String.valueOf(PieceHealthConfig.getQueenHealth()));
@@ -112,7 +192,7 @@ public class ConfigLoader {
             
             saveCSV(PIECE_HEALTH_CONFIG_FILE, config,
                    "# Configuration des points de vie des pièces\n# Format: piece,health");
-            System.out.println("💾 Configuration HP sauvegardée");
+            System.out.println("💾 Configuration HP sauvegardée (fichier)");
             
         } catch (Exception e) {
             System.err.println("❌ Erreur sauvegarde config HP: " + e.getMessage());

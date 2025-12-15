@@ -1,3 +1,4 @@
+com\pong\config\ConfigServiceClient.class
 com\pong\controllers\GameController.class
 com\pong\config\PieceHealthConfig.class
 com\pong\ui\ChessBoard.class
@@ -21,6 +22,8 @@ com\pong\models\ChessPiece$PieceColor.class
 com\pong\controllers\NetworkGameController.class
 com\pong\controllers\GameController$1.class
 com\pong\models\Puck.class
+com\pong\config\ConfigServiceConfig.class
+com\pong\config\ConfigServiceExample.class
 com\pong\config\GameConfig.class
 com\pong\controllers\GameController$2.class
 com\pong\ui\Arrow.class
